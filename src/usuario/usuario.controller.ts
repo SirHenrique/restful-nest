@@ -5,10 +5,12 @@ import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common'
 import { v4 as uuid } from 'uuid';
 import { ListaUsuarioDTO } from './dto/ListaUsuario.dto';
 import { AtualizaUsuarioDTO } from './dto/AtualizaUsuario.dto';
+import { UsuarioService } from './usuario.service';
 
 @Controller('/usuarios')
 export class UsuarioController {
-  constructor(private usuarioRepository: UsuarioRepository) {}
+  constructor(private usuarioRepository: UsuarioRepository,
+    private usuarioService: UsuarioService) {}
 
   @Post()
   async criaUsuario(@Body() dadosDoUsuario: CriaUsuarioDTO) {
@@ -18,7 +20,7 @@ export class UsuarioController {
     usuarioEntity.nome = dadosDoUsuario.nome;
     usuarioEntity.id = uuid();
 
-    this.usuarioRepository.salvar(usuarioEntity);
+    this.usuarioService.criaUsuario(usuarioEntity);
 
     return { 
       usuario: new ListaUsuarioDTO(usuarioEntity.id, usuarioEntity.nome),
@@ -28,17 +30,15 @@ export class UsuarioController {
 
   @Get()
   async listaUsuarios() {
-    const usuariosSalvos = await this.usuarioRepository.listar();
-    const usuariosLista = usuariosSalvos.map(
-      (usuario) => new ListaUsuarioDTO(usuario.id, usuario.nome),
-    );
+    const usuariosSalvos = await this.usuarioService.listaUsuarios();
 
-    return usuariosLista;
+    return usuariosSalvos;
   }
 
   @Put('/:id')
   async atualizaUsuario(@Param('id') id: string, @Body() novosDados: AtualizaUsuarioDTO) {
-    const usuarioAtualizado = await this.usuarioRepository.atualiza(id, novosDados);
+
+    const usuarioAtualizado = await this.usuarioService.atualizaUsuario(id, novosDados);
 
     return {
         usuario: usuarioAtualizado,
@@ -48,7 +48,7 @@ export class UsuarioController {
   
   @Delete('/:id')
   async removeUsuario(@Param('id') id: string){
-    const usuarioRemovido = await this.usuarioRepository.remove(id)
+    const usuarioRemovido = await this.usuarioService.deletaUsuario(id)
 
     return {
         usuario: usuarioRemovido,
