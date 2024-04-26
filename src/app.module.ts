@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PedidoModule } from './pedido/pedido.module';
 import { APP_FILTER } from '@nestjs/core'
 import { FiltroDeExcecaoGlobal } from './filtros/filtro-de-excecao-global';
+import { HealthModule } from './healthcheck/health.module';
 
 
 @Module({
@@ -22,6 +23,7 @@ import { FiltroDeExcecaoGlobal } from './filtros/filtro-de-excecao-global';
     }
     ),
     PedidoModule,
+    HealthModule
   ],
   providers: [
     {
